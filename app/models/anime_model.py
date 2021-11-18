@@ -68,6 +68,24 @@ class Anime:
 
         return Anime(insert_anime).__dict__
 
+    @staticmethod
+    def get_by_id(anime_id):
+        conn, cur = conn_cur()
+
+        query = sql.SQL("""
+            SELECT * 
+            FROM animes
+            WHERE id = {anime_id}
+        """).format(anime_id=sql.Literal(anime_id))
+
+        cur.execute(query)
+
+        get_anime = cur.fetchone()
+
+        close_and_commit(conn, cur)
+
+        return Anime(get_anime).__dict__
+
 
     @staticmethod
     def validate_key(data):

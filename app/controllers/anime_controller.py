@@ -37,7 +37,14 @@ def get_create():
 
 
 def filter(anime_id):
-    return {'data': 'rota em andamento'}, 200
+    try:
+        anime = Anime.get_by_id(anime_id)
+        formated_anime = formate_value_released_date(anime)
+        if formated_anime:
+            return jsonify({"data": [formated_anime]}), 200
+        return jsonify({"error": "Not Found"}), 404
+    except (lookup("42P01"), KeyError):
+        return jsonify({"error": "Not Found"}), 404
 
 
 def update(anime_id):
