@@ -6,6 +6,7 @@ from app.models.exceptions import TypeKeyError
 
 def formate_value_released_date(data):
     data['released_date'] = data['released_date'].strftime('%d/%m/%Y')
+    print(data)
     return data
 
 
@@ -26,7 +27,13 @@ def get_create():
             return {"error": "anime is already exists"}, 409
         return jsonify(formate_value_released_date(inserted_anime)), 201
     if request.method == 'GET':
-        return {'message': 'agora é GET'}, 200
+        try:
+            list_animes = Anime.get_all()
+            new_list_animes = [formate_value_released_date(anime) for anime in list_animes]
+        except lookup("42P01"):
+            Anime.create_table()
+            return jsonify({"data": []}), 200
+        return jsonify({"data": new_list_animes}), 200
 
 
 def filter(anime_id):

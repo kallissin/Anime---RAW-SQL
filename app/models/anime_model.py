@@ -11,6 +11,7 @@ class Anime:
         elif (type(fields) is tuple):
             self.id, self.anime, self.released_date, self.seasons = fields
 
+
     @staticmethod
     def create_table():
         conn, cur = conn_cur()
@@ -28,6 +29,22 @@ class Anime:
 
         close_and_commit(conn, cur)
 
+
+    @staticmethod
+    def get_all():
+        conn, cur = conn_cur()
+
+        query = sql.SQL("""
+            SELECT * FROM {table}
+        """).format(table=sql.Identifier('animes'))
+
+        cur.execute(query)
+
+        list_animes = cur.fetchall()
+
+        close_and_commit(conn, cur)
+
+        return [Anime(anime).__dict__ for anime in list_animes]
 
     def create_anime(self):
         conn, cur = conn_cur()
@@ -60,6 +77,7 @@ class Anime:
             if key not in type_key:
                 raise TypeKeyError(data.keys())
     
+
     @staticmethod
     def format_key_anime(data):
         data['anime'] = data['anime'].title()
