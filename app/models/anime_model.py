@@ -97,19 +97,11 @@ class Anime:
         column = [sql.Identifier(key) for key in data.keys()]
         values = [sql.Literal(value) for value in data.values()]
 
-        query_only_value = """
-            UPDATE animes SET {column} = {values}
+        query = sql.SQL("""
+            UPDATE animes SET ({column}) = row({values})
             WHERE id = {id}
             RETURNING *
-        """
-
-        query_values = """
-            UPDATE animes SET ({column}) = ({values})
-            WHERE id = {id}
-            RETURNING *
-        """
-
-        query = sql.SQL(query_values if len(column) > 1 else query_only_value).format(
+        """).format(
             column=sql.SQL(',').join(column),
             values=sql.SQL(',').join(values),
             id=sql.Literal(anime_id)
