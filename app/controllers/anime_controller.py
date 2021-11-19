@@ -62,4 +62,12 @@ def update(anime_id):
 
 
 def delete(anime_id):
-    return {'data': 'rota em andamento'}, 200
+    try:
+        result_verification = Anime.verify_id_exists(anime_id)
+        if result_verification:    
+            anime = Anime.delete_anime(anime_id)
+            formated_anime = formate_value_released_date(anime)
+            return jsonify(formated_anime), 200
+        return jsonify({"error": "Not Found"}), 404
+    except (lookup("42P01"), KeyError):
+        return jsonify({"error": "Not Found"}), 404

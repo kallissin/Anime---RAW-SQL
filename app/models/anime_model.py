@@ -46,6 +46,7 @@ class Anime:
 
         return [Anime(anime).__dict__ for anime in list_animes]
 
+
     def create_anime(self):
         conn, cur = conn_cur()
 
@@ -68,6 +69,7 @@ class Anime:
 
         return Anime(insert_anime).__dict__
 
+
     @staticmethod
     def get_by_id(anime_id):
         conn, cur = conn_cur()
@@ -87,6 +89,7 @@ class Anime:
         return Anime(get_anime).__dict__
 
 
+    @staticmethod
     def update_anime(anime_id, data):
         
         conn, cur = conn_cur()
@@ -120,6 +123,23 @@ class Anime:
         print(get_anime)
         return Anime(get_anime).__dict__
 
+
+    @staticmethod
+    def delete_anime(anime_id):
+        conn, cur = conn_cur()
+
+        query = sql.SQL("""
+            DELETE FROM animes WHERE id = {anime_id} RETURNING *
+        """).format(anime_id=sql.Literal(anime_id))
+
+        cur.execute(query)
+
+        deleted_anime = cur.fetchone()
+
+        close_and_commit(conn, cur)
+        print(deleted_anime)
+        return Anime(deleted_anime).__dict__
+
     @staticmethod
     def validate_key(data):
         type_key = ['anime', 'released_date', 'seasons']
@@ -132,3 +152,19 @@ class Anime:
     def format_key_anime(data):
         data['anime'] = data['anime'].title()
         return data
+
+
+    @staticmethod
+    def verify_id_exists(anime_id):
+        conn, cur = conn_cur()
+
+        query = sql.SQL("""
+            SELECT EXISTS (SELECT * FROM animes WHERE id = {anime_id})
+        """).format(anime_id=sql.Literal(anime_id))
+
+        cur.execute(query)
+
+        exists_id = list(cur.fetchone())[0]
+
+        close_and_commit(conn, cur)
+        return exists_id
