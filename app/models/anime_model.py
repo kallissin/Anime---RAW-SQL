@@ -87,10 +87,42 @@ class Anime:
         return Anime(get_anime).__dict__
 
 
+    def update_anime(anime_id, data):
+        
+        conn, cur = conn_cur()
+
+        column = [sql.Identifier(key) for key in data.keys()]
+        values = [sql.Literal(value) for value in data.values()]
+
+        query_only_value = """
+            UPDATE animes SET {column} = {values}
+            WHERE id = {id}
+            RETURNING *
+        """
+
+        query_values = """
+            UPDATE animes SET ({column}) = ({values})
+            WHERE id = {id}
+            RETURNING *
+        """
+
+        query = sql.SQL(query_values if len(column) > 1 else query_only_value).format(
+            column=sql.SQL(',').join(column),
+            values=sql.SQL(',').join(values),
+            id=sql.Literal(anime_id)
+            )
+
+        cur.execute(query)
+
+        get_anime = cur.fetchone()
+
+        close_and_commit(conn, cur)
+        print(get_anime)
+        return Anime(get_anime).__dict__
+
     @staticmethod
     def validate_key(data):
         type_key = ['anime', 'released_date', 'seasons']
-        print(data)
         for key in data.keys():
             if key not in type_key:
                 raise TypeKeyError(data.keys())

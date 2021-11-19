@@ -6,7 +6,6 @@ from app.models.exceptions import TypeKeyError
 
 def formate_value_released_date(data):
     data['released_date'] = data['released_date'].strftime('%d/%m/%Y')
-    print(data)
     return data
 
 
@@ -48,7 +47,18 @@ def filter(anime_id):
 
 
 def update(anime_id):
-    return {'data': 'rota em andamento'}, 200
+    data = request.get_json()
+    try:
+        Anime.validate_key(data)
+        if 'anime' in data.keys():
+            data = Anime.format_key_anime(data)
+        anime = Anime.update_anime(anime_id, data)
+        formated_anime = formate_value_released_date(anime)
+    except TypeKeyError as err:
+        return jsonify(err.__dict__['message']), 422
+    except (lookup("42P01"), KeyError):
+        return jsonify({"error": "Not Found"}), 404
+    return jsonify(formated_anime), 200
 
 
 def delete(anime_id):
