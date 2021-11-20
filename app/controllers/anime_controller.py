@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from psycopg2.errors import lookup
 from app.models.anime_model import Anime
-from app.models.exceptions import TypeKeyError
+from app.exc.exceptions import TypeKeyError
 
 
 def formate_value_released_date(data):

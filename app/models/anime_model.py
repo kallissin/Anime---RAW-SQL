@@ -1,6 +1,6 @@
 from psycopg2 import sql
 from app.models import close_and_commit, conn_cur
-from app.models.exceptions import TypeKeyError
+from app.exc.exceptions import TypeKeyError
 
 
 class Anime:
